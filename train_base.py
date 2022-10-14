@@ -8,7 +8,7 @@ import torch
 from flair.datasets import ColumnCorpus
 from flair.data import Corpus
 from flair.models import SequenceTagger
-from flair.embeddings import FastTextEmbeddings, StackedEmbeddings, FlairEmbeddings, TokenEmbeddings
+from flair.embeddings import FastTextEmbeddings, StackedEmbeddings, FlairEmbeddings, TokenEmbeddings, CharacterEmbeddings
 from flair.trainers import ModelTrainer
 
 
@@ -137,6 +137,17 @@ if __name__ == "__main__":
         "uk.flairembeddings": {
             "embeddings": lambda: StackedEmbeddings(
                 [
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
+                ]
+            ),
+            "hidden_size": 256,
+            "rnn_layers": 1,
+        },
+        "uk.flairembeddings.charembeddings": {
+            "embeddings": lambda: StackedEmbeddings(
+                [
+                    CharacterEmbeddings(),
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
                 ]
