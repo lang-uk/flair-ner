@@ -50,7 +50,7 @@ class UKR_NER_CORP(ColumnCorpus):
         )
 
 
-def choochoo(name: Path, hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str) -> None:
+def choochoo(hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str) -> None:
     # define columns
     columns = {0: "text", 1: "ner"}
 
