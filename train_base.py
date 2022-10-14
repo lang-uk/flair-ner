@@ -69,7 +69,7 @@ def choochoo(hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, con
     tagger: SequenceTagger = SequenceTagger(
         hidden_size=hidden_size,
         rnn_layers=rnn_layers,
-        embeddings=embeddings,
+        embeddings=embeddings(),
         tag_dictionary=tag_dictionary,
         tag_type=tag_type,
         use_crf=True,
@@ -88,7 +88,7 @@ def choochoo(hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, con
 
         trainer.resume(
             trained_model,
-            base_path=checkpoint_path.parent,
+            base_path=results_path,
             learning_rate=0.1,
             mini_batch_size=32,
             checkpoint=True,
@@ -103,7 +103,7 @@ def choochoo(hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, con
     else:
         # 7. start training
         trainer.train(
-            checkpoint_path.parent,
+            results_path,
             learning_rate=0.1,
             mini_batch_size=32,
             checkpoint=True,
@@ -130,12 +130,12 @@ if __name__ == "__main__":
 
     config = {
         "fb.fasttext": {
-            "embeddings": FastTextEmbeddings(args.embeddings_dir / "fasttext/uk/cc.uk.300.bin"),
+            "embeddings": lambda: FastTextEmbeddings(args.embeddings_dir / "fasttext/uk/cc.uk.300.bin"),
             "hidden_size": 256,
             "rnn_layers": 1,
         },
         "uk.flairembeddings": {
-            "embeddings": StackedEmbeddings(
+            "embeddings": lambda: StackedEmbeddings(
                 [
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
@@ -145,7 +145,7 @@ if __name__ == "__main__":
             "rnn_layers": 1,
         },
         "uk.flairembeddings.large": {
-            "embeddings": StackedEmbeddings(
+            "embeddings": lambda: StackedEmbeddings(
                 [
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
@@ -155,7 +155,7 @@ if __name__ == "__main__":
             "rnn_layers": 1,
         },
         "uk.flairembeddings.xlarge": {
-            "embeddings": StackedEmbeddings(
+            "embeddings": lambda: StackedEmbeddings(
                 [
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
