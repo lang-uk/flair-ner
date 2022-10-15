@@ -144,6 +144,27 @@ if __name__ == "__main__":
             "hidden_size": 256,
             "rnn_layers": 1,
         },
+        "uk.flairembeddings.fasttext": {
+            "embeddings": lambda: StackedEmbeddings(
+                [
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
+                    FastTextEmbeddings(args.embeddings_dir / "fasttext/uk/cc.uk.300.bin"),
+                ]
+            ),
+            "hidden_size": 256,
+            "rnn_layers": 1,
+        },
+        "uk.flairembeddings.x2": {
+            "embeddings": lambda: StackedEmbeddings(
+                [
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
+                ]
+            ),
+            "hidden_size": 256,
+            "rnn_layers": 2,
+        },
         "uk.flairembeddings.charembeddings": {
             "embeddings": lambda: StackedEmbeddings(
                 [
