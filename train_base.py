@@ -8,8 +8,15 @@ import torch
 from flair.datasets import ColumnCorpus
 from flair.data import Corpus
 from flair.models import SequenceTagger
-from flair.embeddings import FastTextEmbeddings, StackedEmbeddings, FlairEmbeddings, TokenEmbeddings, CharacterEmbeddings
+from flair.embeddings import (
+    FastTextEmbeddings,
+    StackedEmbeddings,
+    FlairEmbeddings,
+    TokenEmbeddings,
+    CharacterEmbeddings,
+)
 from flair.trainers import ModelTrainer
+from torch.optim.adam import Adam
 
 
 flair.device = torch.device("cpu")
@@ -50,7 +57,9 @@ class UKR_NER_CORP(ColumnCorpus):
         )
 
 
-def choochoo(hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str) -> None:
+def choochoo(
+    hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str, optimize_lr: bool = False
+) -> None:
     # define columns
     columns = {0: "text", 1: "ner"}
 
@@ -102,19 +111,22 @@ def choochoo(hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, con
         )
     else:
         # 7. start training
-        trainer.train(
-            results_path,
-            learning_rate=0.1,
-            mini_batch_size=32,
-            checkpoint=True,
-            train_with_dev=True,
-            monitor_test=True,
-            max_epochs=150,
-            embeddings_storage_mode="cpu",
-            use_tensorboard=True,
-            tensorboard_log_dir=tensorboard_path,
-            tensorboard_comment=f"Flair UK: {config_name}",
-        )
+        if optimize_lr:
+            trainer.find_learning_rate(results_path, Adam)
+        else:
+            trainer.train(
+                results_path,
+                learning_rate=0.1,
+                mini_batch_size=32,
+                checkpoint=True,
+                train_with_dev=True,
+                monitor_test=True,
+                max_epochs=150,
+                embeddings_storage_mode="cpu",
+                use_tensorboard=True,
+                tensorboard_log_dir=tensorboard_path,
+                tensorboard_comment=f"Flair UK: {config_name}",
+            )
 
 
 if __name__ == "__main__":
@@ -135,6 +147,16 @@ if __name__ == "__main__":
             "rnn_layers": 1,
         },
         "uk.flairembeddings": {
+            "embeddings": lambda: StackedEmbeddings(
+                [
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
+                ]
+            ),
+            "hidden_size": 256,
+            "rnn_layers": 1,
+        },
+        "uk.flairembeddings.find_lr": {
             "embeddings": lambda: StackedEmbeddings(
                 [
                     FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
