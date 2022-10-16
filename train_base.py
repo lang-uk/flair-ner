@@ -58,7 +58,8 @@ class UKR_NER_CORP(ColumnCorpus):
 
 
 def choochoo(
-    hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str, optimize_lr: bool = False
+    hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str, optimize_lr: bool = False,
+    learning_rate: float = 0.1
 ) -> None:
     # define columns
     columns = {0: "text", 1: "ner"}
@@ -98,7 +99,7 @@ def choochoo(
         trainer.resume(
             trained_model,
             base_path=results_path,
-            learning_rate=0.1,
+            learning_rate=learning_rate,
             mini_batch_size=32,
             checkpoint=True,
             train_with_dev=True,
@@ -116,7 +117,7 @@ def choochoo(
         else:
             trainer.train(
                 results_path,
-                learning_rate=0.1,
+                learning_rate=learning_rate,
                 mini_batch_size=32,
                 checkpoint=True,
                 train_with_dev=True,
@@ -155,6 +156,17 @@ if __name__ == "__main__":
             ),
             "hidden_size": 256,
             "rnn_layers": 1,
+        },
+        "uk.flairembeddings.lr0.5": {
+            "embeddings": lambda: StackedEmbeddings(
+                [
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
+                ]
+            ),
+            "hidden_size": 256,
+            "rnn_layers": 1,
+            "learning_rate": 0.5
         },
         "uk.flairembeddings.find_lr": {
             "embeddings": lambda: StackedEmbeddings(
