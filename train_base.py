@@ -165,6 +165,7 @@ if __name__ == "__main__":
             ),
             "hidden_size": 256,
             "rnn_layers": 1,
+            "optimize_lr": True,
         },
         "uk.flairembeddings.fasttext": {
             "embeddings": lambda: StackedEmbeddings(
