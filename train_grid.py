@@ -35,7 +35,7 @@ def choochoochoo(embeddings: TokenEmbeddings) -> None:
     search_space.add(Parameter.MINI_BATCH_SIZE, hp.choice, options=[8, 16, 32])
 
     param_selector = SequenceTaggerParamSelector(
-        corpus, "ner", results_path=Path("./ner-tests/flair.grid/"), training_runs=3, max_epochs=150
+        corpus, "ner", base_path=Path("./ner-tests/flair.grid/"), training_runs=3, max_epochs=150
     )
 
     # start the optimization
