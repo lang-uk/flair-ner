@@ -1,5 +1,4 @@
 import argparse
-from typing import Union
 from pathlib import Path
 
 import flair
@@ -17,44 +16,6 @@ from flair.embeddings import (
 )
 from flair.trainers import ModelTrainer
 from torch.optim.adam import Adam
-
-
-flair.device = torch.device("cpu")
-
-
-class UKR_NER_CORP(ColumnCorpus):
-    def __init__(
-        self,
-        data_folder: Union[str, Path] = None,
-        tag_to_bioes: str = "ner",
-        in_memory: bool = True,
-        document_as_sequence: bool = False,
-        **corpusargs,
-    ):
-        """
-        Initialize a preprocessed version of the Ukrainian Named Entity
-        Recognition Corpus(lang-uk ner) dataset available
-        from https://github.com/lang-uk/ner-uk
-
-        # TODO: re-enable downloader as soon as we publish the corpus somewhere
-        :param tag_to_bioes: NER by default, need not be changed
-        :param in_memory: If True, keeps dataset in memory giving speedups in training.
-        :param document_as_sequence: If True, all sentences of a document are read into a single Sentence object
-        """
-        if type(data_folder) == str:
-            data_folder: Path = Path(data_folder)
-
-        # column format
-        columns = {0: "text", 1: "ner"}
-
-        super(UKR_NER_CORP, self).__init__(
-            data_folder,
-            columns,
-            # tag_to_bioes=tag_to_bioes,
-            encoding="utf-8",
-            in_memory=in_memory,
-            **corpusargs,
-        )
 
 
 def choochoo(
@@ -131,9 +92,11 @@ def choochoo(
 
 
 if __name__ == "__main__":
+    flair.device = torch.device("cpu")
+
     parser = argparse.ArgumentParser(
-        description="""That is the node worker to compute fasttext """
-        """vectors using different params, store obtained vectors on gdrive and update google spreadsheet"""
+        description="""That is the simple trainer that can accept a base dir
+with embeddings and the name of the config to train the model"""
     )
 
     parser.add_argument("--embeddings-dir", type=Path, help="Path base dir with embeddings", default=Path("/data/"))
