@@ -20,7 +20,7 @@ from torch.optim.adam import Adam
 
 def choochoo(
     hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str, optimize_lr: bool = False,
-    learning_rate: float = 0.1
+    learning_rate: float = 0.1, mini_batch_size: int = 32, dropout: float: 0.0
 ) -> None:
     # define columns
     columns = {0: "text", 1: "ner"}
@@ -44,6 +44,7 @@ def choochoo(
         tag_dictionary=tag_dictionary,
         tag_type=tag_type,
         use_crf=True,
+        dropout=dropout
     )
 
     # 6. initialize trainer
@@ -61,12 +62,12 @@ def choochoo(
             trained_model,
             base_path=results_path,
             learning_rate=learning_rate,
-            mini_batch_size=32,
+            mini_batch_size=mini_batch_size,
             checkpoint=True,
             train_with_dev=True,
             monitor_test=True,
             max_epochs=150,
-            embeddings_storage_mode="cpu",
+            embeddings_storage_mode="gpu",
             use_tensorboard=True,
             tensorboard_log_dir=tensorboard_path,
             tensorboard_comment=f"Flair UK: {config_name}",
@@ -79,12 +80,12 @@ def choochoo(
             trainer.train(
                 results_path,
                 learning_rate=learning_rate,
-                mini_batch_size=32,
+                mini_batch_size=mini_batch_size,
                 checkpoint=True,
                 train_with_dev=True,
                 monitor_test=True,
                 max_epochs=150,
-                embeddings_storage_mode="cpu",
+                embeddings_storage_mode="gpu",
                 use_tensorboard=True,
                 tensorboard_log_dir=tensorboard_path,
                 tensorboard_comment=f"Flair UK: {config_name}",
@@ -92,7 +93,7 @@ def choochoo(
 
 
 if __name__ == "__main__":
-    flair.device = torch.device("cpu")
+    flair.device = torch.device("gpu")
 
     parser = argparse.ArgumentParser(
         description="""That is the simple trainer that can accept a base dir
@@ -193,6 +194,19 @@ with embeddings and the name of the config to train the model"""
             ),
             "hidden_size": 1024,
             "rnn_layers": 1,
+        },
+        "uk.flairembeddings.champ": {
+            "embeddings": lambda: StackedEmbeddings(
+                [
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
+                    FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
+                ]
+            ),
+            "hidden_size": 128,
+            "rnn_layers": 2,
+            "learning_rate": 0.1,
+            "mini_batch_size": 32,
+            "dropout": 0.3380078963015963
         },
     }
 
