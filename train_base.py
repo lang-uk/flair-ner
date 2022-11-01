@@ -99,7 +99,7 @@ def choochoo(
 
 
 if __name__ == "__main__":
-    flair.device = torch.device("gpu")
+    flair.device = torch.device("cuda:0")
 
     parser = argparse.ArgumentParser(
         description="""That is the simple trainer that can accept a base dir
