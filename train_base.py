@@ -19,8 +19,14 @@ from torch.optim.adam import Adam
 
 
 def choochoo(
-    hidden_size: int, rnn_layers: int, embeddings: TokenEmbeddings, config_name: str, optimize_lr: bool = False,
-    learning_rate: float = 0.1, mini_batch_size: int = 32, dropout: float: 0.0
+    hidden_size: int,
+    rnn_layers: int,
+    embeddings: TokenEmbeddings,
+    config_name: str,
+    optimize_lr: bool = False,
+    learning_rate: float = 0.1,
+    mini_batch_size: int = 32,
+    dropout: float = 0.0,
 ) -> None:
     # define columns
     columns = {0: "text", 1: "ner"}
@@ -44,7 +50,7 @@ def choochoo(
         tag_dictionary=tag_dictionary,
         tag_type=tag_type,
         use_crf=True,
-        dropout=dropout
+        dropout=dropout,
     )
 
     # 6. initialize trainer
@@ -130,7 +136,7 @@ with embeddings and the name of the config to train the model"""
             ),
             "hidden_size": 256,
             "rnn_layers": 1,
-            "learning_rate": 0.5
+            "learning_rate": 0.5,
         },
         "uk.flairembeddings.find_lr": {
             "embeddings": lambda: StackedEmbeddings(
@@ -206,7 +212,7 @@ with embeddings and the name of the config to train the model"""
             "rnn_layers": 2,
             "learning_rate": 0.1,
             "mini_batch_size": 32,
-            "dropout": 0.3380078963015963
+            "dropout": 0.3380078963015963,
         },
     }
 
