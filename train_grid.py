@@ -12,6 +12,7 @@ from flair.embeddings import (
     StackedEmbeddings,
     FlairEmbeddings,
     TokenEmbeddings,
+    CharacterEmbeddings,
 )
 
 
@@ -35,15 +36,15 @@ def choochoochoo(embeddings: TokenEmbeddings) -> None:
     search_space.add(Parameter.MINI_BATCH_SIZE, hp.choice, options=[8, 16, 32])
 
     param_selector = SequenceTaggerParamSelector(
-        corpus, "ner", base_path=Path("./ner-tests/flair.grid/"), training_runs=3, max_epochs=150
+        corpus, "ner", base_path=Path("./ner-tests/flair.grid.charemb/"), training_runs=2, max_epochs=150
     )
 
     # start the optimization
-    param_selector.optimize(search_space, max_evals=100)
+    param_selector.optimize(search_space, max_evals=15)
 
 
 if __name__ == "__main__":
-    flair.device = torch.device("cpu")
+    flair.device = torch.device("cuda:1")
 
     parser = argparse.ArgumentParser(
         description="""That is the hyperparam opt trainer that can accept a base dir with embeddings"""
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     choochoochoo(
         lambda: StackedEmbeddings(
             [
+                CharacterEmbeddings(path_to_char_dict=args.embeddings_dir / "flair/uk/flair_dictionary.pkl"),
                 FlairEmbeddings(args.embeddings_dir / "flair/uk/backward/best-lm.pt"),
                 FlairEmbeddings(args.embeddings_dir / "flair/uk/forward/best-lm.pt"),
             ]
